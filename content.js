@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       handleLoginStatusCheck(sendResponse);
       break;
     case 'getTweetContext':
-      sendResponse(currentTweetContext);
+      sendResponse(getCurrentTweetContext());
       break;
     case 'insertReply':
       insertReplyIntoTweet(request.reply);
@@ -16,44 +16,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 let currentTweetContext = null;
 
-function checkLoginStatus() {
-  const userNav = document.querySelector('[data-testid="SideNav_AccountSwitcher_Button"]');
-  return !!userNav;
-}
+function getCurrentTweetContext() {
+  // Look for the reply box and the tweet text above it
+  const replyBox = document.querySelector('[data-testid="tweetTextarea_0"]');
+  if (!replyBox) return null;
 
-function getTweetContext() {
-  if (!window.location.pathname.includes('/status/')) {
-    return null;
-  }
+  // Get the tweet we're replying to
+  const tweetText = Array.from(document.querySelectorAll('[data-testid="tweetText"]'))
+    .map(element => element.textContent)
+    .filter(text => text.length > 0)[0];
 
-  const tweetText = document.querySelector('[data-testid="tweetText"]');
-  const authorElement = document.querySelector('[data-testid="User-Name"]');
-  
-  if (!tweetText || !authorElement) return null;
+  if (!tweetText) return null;
 
   return {
-    text: tweetText.textContent,
-    author: authorElement.textContent,
-    url: window.location.href
+    text: tweetText,
+    canReply: true
   };
 }
 
 function handleLoginStatusCheck(sendResponse) {
-  const loggedIn = checkLoginStatus();
-  currentTweetContext = loggedIn ? getTweetContext() : null;
-  sendResponse({ loggedIn, tweetContext: currentTweetContext });
+  const tweetContext = getCurrentTweetContext();
+  sendResponse({
+    loggedIn: true,
+    tweetContext: tweetContext
+  });
 }
 
 function insertReplyIntoTweet(reply) {
-  const replyButton = document.querySelector('[data-testid="reply"]');
-  if (replyButton) {
-    replyButton.click();
-    setTimeout(() => {
-      const textarea = document.querySelector('[data-testid="tweetTextarea_0"]');
-      if (textarea) {
-        textarea.value = reply;
-        textarea.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-    }, 500);
+  const textarea = document.querySelector('[data-testid="tweetTextarea_0"]');
+  if (textarea) {
+    textarea.value = reply;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
   }
 }
