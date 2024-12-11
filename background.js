@@ -118,5 +118,5 @@ function generateSupportiveComment() {
     'You are making such a positive impact! ✨',
     'Keep leading the way! 🎯'
   ];
-  return comments[Math.floor(Math.random() * responses.length)];
+  return comments[Math.floor(Math.random() * comments.length)];
 }
