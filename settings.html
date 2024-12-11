@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>X Reply Assistant - Character Management</title>
+  <link rel="stylesheet" type="text/css" href="settings.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Character Management</h1>
+    
+    <div class="character-list" id="characterList">
+      <!-- Characters will be inserted here -->
+    </div>
+
+    <button id="addCharacter" class="btn primary">Add New Character</button>
+
+    <!-- Character Edit Modal -->
+    <div id="characterModal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="modalTitle">Add Character</h2>
+        <form id="characterForm">
+          <div class="form-group">
+            <label for="charName">Name:</label>
+            <input type="text" id="charName" required>
+          </div>
+
+          <div class="form-group">
+            <label for="charTone">Tone:</label>
+            <select id="charTone" required>
+              <option value="formal">Formal</option>
+              <option value="casual">Casual</option>
+              <option value="friendly">Friendly</option>
+              <option value="professional">Professional</option>
+              <option value="humorous">Humorous</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Traits:</label>
+            <div class="traits-container" id="traitsContainer">
+              <input type="text" class="trait-input" placeholder="Add trait and press Enter">
+              <div class="traits-list" id="traitsList"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Response Patterns:</label>
+            <div class="patterns-container">
+              <textarea id="patterns" rows="4" placeholder="Enter response patterns, one per line. Use {topic}, {point}, etc. as placeholders"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-buttons">
+            <button type="button" class="btn secondary" id="cancelEdit">Cancel</button>
+            <button type="submit" class="btn primary">Save Character</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="settings.js"></script>
+</body>
+</html>
