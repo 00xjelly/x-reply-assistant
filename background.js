@@ -8,7 +8,8 @@ chrome.runtime.onInstalled.addListener((details) => {
 // Listen for messages
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'generateReply') {
-    handleReplyGeneration(request, sendResponse);
+    const reply = handleReplyGeneration(request);
+    sendResponse({ reply });
     return true;
   }
 });
@@ -34,7 +35,7 @@ function initializeDefaultCharacters() {
       responsePatterns: [
         'Love this take on {topic}! ⭐ {positiveReinforcement}',
         'This is amazing! 🎉 {enthusiasticResponse}',
-        'You're absolutely crushing it! 💪 {supportiveComment}'
+        'You are absolutely crushing it! 💪 {supportiveComment}'
       ]
     }
   ];
@@ -42,19 +43,15 @@ function initializeDefaultCharacters() {
   chrome.storage.sync.set({ characters: defaultCharacters });
 }
 
-function handleReplyGeneration(request, sendResponse) {
+function handleReplyGeneration(request) {
   const { character, tweetContext } = request;
-  const reply = generateReply(character, tweetContext);
-  sendResponse({ reply });
+  return generateReply(character, tweetContext);
 }
 
 function generateReply(character, tweetContext) {
   const pattern = character.responsePatterns[Math.floor(Math.random() * character.responsePatterns.length)];
-  
-  // Extract context
   const topic = extractTopic(tweetContext.text);
   
-  // Generate components
   return pattern
     .replace('{topic}', topic)
     .replace('{constructivePoint}', generateConstructivePoint())
@@ -66,7 +63,6 @@ function generateReply(character, tweetContext) {
 }
 
 function extractTopic(text) {
-  // Simple topic extraction
   const words = text.split(' ').filter(word => word.length > 4);
   return words[Math.floor(Math.random() * words.length)] || 'this';
 }
@@ -110,7 +106,7 @@ function generatePositiveReinforcement() {
 function generateEnthusiasticResponse() {
   const responses = [
     'Keep sharing these amazing ideas! 🚀',
-    'You're really onto something here! ⭐',
+    'You are really onto something here! ⭐',
     'This is pure genius! 💫'
   ];
   return responses[Math.floor(Math.random() * responses.length)];
@@ -119,8 +115,8 @@ function generateEnthusiasticResponse() {
 function generateSupportiveComment() {
   const comments = [
     'Your dedication to this is inspiring! ⭐',
-    'You're making such a positive impact! ✨',
+    'You are making such a positive impact! ✨',
     'Keep leading the way! 🎯'
   ];
-  return comments[Math.floor(Math.random() * comments.length)];
+  return comments[Math.floor(Math.random() * responses.length)];
 }
