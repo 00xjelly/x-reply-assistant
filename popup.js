@@ -1,3 +1,5 @@
+let currentTweetContext = null;
+
 // Initialize popup when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   checkLoginAndTweetStatus();
@@ -8,20 +10,19 @@ document.addEventListener('DOMContentLoaded', function() {
 // Setup event listeners
 function setupEventListeners() {
   document.getElementById('characters').addEventListener('change', handleCharacterChange);
+  document.getElementById('regenerateReply').addEventListener('click', handleRegenerateClick);
   document.getElementById('copyReply').addEventListener('click', copyReplyToClipboard);
   document.getElementById('insertReply').addEventListener('click', insertReply);
   document.getElementById('manageCharacters').addEventListener('click', openCharacterManager);
 }
 
-// Check if user is logged in and on a tweet
+// Check if user is in reply context
 function checkLoginAndTweetStatus() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {action: 'checkLoginStatus'}, function(response) {
-      if (response && response.loggedIn) {
+      if (response && response.tweetContext) {
+        currentTweetContext = response.tweetContext;
         showMainContent();
-        if (response.tweetContext) {
-          handleTweetContext(response.tweetContext);
-        }
       } else {
         showLoginPrompt();
       }
@@ -36,6 +37,7 @@ function showMainContent() {
 }
 
 function showLoginPrompt() {
+  document.getElementById('loginStatus').textContent = 'Open a tweet and click reply to use this extension';
   document.getElementById('loginStatus').classList.remove('hidden');
   document.getElementById('mainContent').classList.add('hidden');
 }
@@ -63,19 +65,23 @@ function populateCharacterSelect(characters) {
 
 // Handle character selection change
 function handleCharacterChange() {
+  generateReplyForCurrentCharacter();
+}
+
+// Handle regenerate button click
+function handleRegenerateClick() {
+  generateReplyForCurrentCharacter();
+}
+
+// Generate reply using current character
+function generateReplyForCurrentCharacter() {
   const characterId = document.getElementById('characters').value;
   if (characterId === 'default') {
     clearReply();
     return;
   }
 
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {action: 'getTweetContext'}, function(tweetContext) {
-      if (tweetContext) {
-        generateReply(characterId, tweetContext);
-      }
-    });
-  });
+  generateReply(characterId, currentTweetContext);
 }
 
 // Clear reply area
@@ -131,12 +137,4 @@ function insertReply() {
 // Open character manager
 function openCharacterManager() {
   chrome.runtime.openOptionsPage();
-}
-
-// Handle tweet context updates
-function handleTweetContext(context) {
-  const characterId = document.getElementById('characters').value;
-  if (characterId !== 'default') {
-    generateReply(characterId, context);
-  }
 }
