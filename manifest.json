@@ -1,12 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "X Reply Assistant",
+  "name": "Twitter Reply Helper",
   "version": "1.0",
-  "description": "Generate character-based replies for X posts",
+  "description": "Generate character-based replies for X (Twitter)",
   "permissions": ["activeTab", "storage"],
   "host_permissions": ["https://twitter.com/*", "https://x.com/*"],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "128": "icon.png"
   },
   "background": {
     "service_worker": "background.js"
