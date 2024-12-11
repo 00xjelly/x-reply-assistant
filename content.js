@@ -17,19 +17,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 let currentTweetContext = null;
 
 function getCurrentTweetContext() {
-  // Look for the reply box and the tweet text above it
-  const replyBox = document.querySelector('[data-testid="tweetTextarea_0"]');
+  // First find the reply input field to confirm we're in reply mode
+  const replyBox = document.querySelector('[role="textbox"]');
   if (!replyBox) return null;
 
-  // Get the tweet we're replying to
-  const tweetText = Array.from(document.querySelectorAll('[data-testid="tweetText"]'))
-    .map(element => element.textContent)
-    .filter(text => text.length > 0)[0];
+  // Find all article elements which contain tweets
+  const articles = document.querySelectorAll('article');
+  if (!articles.length) return null;
 
-  if (!tweetText) return null;
+  // Get the first article (the tweet we're replying to)
+  const mainTweet = articles[0];
+  
+  // Find the tweet text within the article
+  const tweetTextElement = mainTweet.querySelector('[data-testid="tweetText"]');
+  if (!tweetTextElement) {
+    // If no tweetText element, try to get any text content from the article
+    const tweetContent = mainTweet.textContent;
+    if (!tweetContent) return null;
+    
+    return {
+      text: tweetContent,
+      canReply: true
+    };
+  }
 
   return {
-    text: tweetText,
+    text: tweetTextElement.textContent,
     canReply: true
   };
 }
@@ -43,9 +56,9 @@ function handleLoginStatusCheck(sendResponse) {
 }
 
 function insertReplyIntoTweet(reply) {
-  const textarea = document.querySelector('[data-testid="tweetTextarea_0"]');
+  const textarea = document.querySelector('[role="textbox"]');
   if (textarea) {
-    textarea.value = reply;
+    textarea.textContent = reply;
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
   }
 }
