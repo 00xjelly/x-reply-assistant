@@ -13,6 +13,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+const emphasisFunctions = {
+  uppercase: text => text.toUpperCase(),
+  spaced: text => text.split('').join('.'),
+  sparkles: text => `✨${text}✨`,
+  crystal: text => `🔮${text}🔮`,
+  exclaim: text => text.split('').map(char => `${char}!`).join('')
+};
+
 function initializeDefaultCharacters() {
   const defaultCharacters = [
     {
@@ -32,13 +40,7 @@ function initializeDefaultCharacters() {
         '!!!', '!?!?!', '...', '👁️', '🔺', '⚠️', '🌌', '🧠', '🔮',
         '🛸', '🌀', '💫', '🌟', '⚡', '🔥', '💥', '🤯', '👽'
       ],
-      emphasisPatterns: [
-        text => text.toUpperCase(),
-        text => text.split('').join('.'),
-        text => `✨${text}✨`,
-        text => `🔮${text}🔮`,
-        text => text.split('').map(char => `${char}!`).join(''),
-      ]
+      emphasisTypes: ['uppercase', 'spaced', 'sparkles', 'crystal', 'exclaim']
     }
   ];
 
@@ -81,9 +83,10 @@ function generateChaosReply(character, tweetContext) {
 
   // Randomly apply emphasis to some segments
   reply = reply.map(segment => {
-    if (Math.random() > 0.7) { // 30% chance of emphasis
-      const emphasisPattern = character.emphasisPatterns[Math.floor(Math.random() * character.emphasisPatterns.length)];
-      return emphasisPattern(segment);
+    if (Math.random() > 0.7 && segment.length > 0) { // 30% chance of emphasis
+      const emphasisType = character.emphasisTypes[Math.floor(Math.random() * character.emphasisTypes.length)];
+      const emphasisFunction = emphasisFunctions[emphasisType];
+      return emphasisFunction ? emphasisFunction(segment) : segment;
     }
     return segment;
   });
