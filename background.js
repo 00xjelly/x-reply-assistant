@@ -5,7 +5,6 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-// Listen for messages
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'generateReply') {
     const reply = handleReplyGeneration(request);
@@ -17,25 +16,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 function initializeDefaultCharacters() {
   const defaultCharacters = [
     {
-      id: 'professional',
-      name: 'Professional',
-      tone: 'formal',
-      traits: ['articulate', 'respectful', 'insightful'],
-      responsePatterns: [
-        'Thank you for sharing your perspective on {topic}. {constructivePoint}',
-        'Interesting analysis. From my professional experience, {insight}',
-        'This raises some important points about {topic}. Consider also {addition}'
-      ]
-    },
-    {
-      id: 'cheerful',
-      name: 'Cheerful Supporter',
-      tone: 'positive',
-      traits: ['enthusiastic', 'encouraging', 'optimistic'],
-      responsePatterns: [
-        'Love this take on {topic}! ⭐ {positiveReinforcement}',
-        'This is amazing! 🎉 {enthusiasticResponse}',
-        'You are absolutely crushing it! 💪 {supportiveComment}'
+      id: 'chaotic',
+      name: 'Unhinged Chaos',
+      tone: 'chaotic',
+      traits: ['erratic', 'obsessive', 'conspiracy-minded', 'unpredictable'],
+      vocabulary: [
+        'WAKE UP SHEEPLE', 'conspiracy', 'they don\'t want you to know', 'cosmic energy',
+        'lizard people', 'mind control', 'THE TRUTH', 'secret society', 'ancient aliens',
+        'dimensional portals', 'chemtrails', 'quantum consciousness', 'parallel universes',
+        'time is not real', 'reality matrix', 'brain frequencies', 'cosmic alignment',
+        'energy vampires', 'thought control', 'synthetic reality'
+      ],
+      expressions: [
+        '!!!', '!?!?!', '...', '👁️', '🔺', '⚠️', '🌌', '🧠', '🔮', 
+        '🛸', '🌀', '💫', '🌟', '⚡', '🔥', '💥', '🤯', '👽'
+      ],
+      emphasisPatterns: [
+        text => text.toUpperCase(),
+        text => text.split('').join('.'),
+        text => `✨${text}✨`,
+        text => `🔮${text}🔮`,
+        text => text.split('').map(char => `${char}!`).join(''),
       ]
     }
   ];
@@ -45,78 +46,61 @@ function initializeDefaultCharacters() {
 
 function handleReplyGeneration(request) {
   const { character, tweetContext } = request;
-  return generateReply(character, tweetContext);
+  return generateChaosReply(character, tweetContext);
 }
 
-function generateReply(character, tweetContext) {
-  const pattern = character.responsePatterns[Math.floor(Math.random() * character.responsePatterns.length)];
-  const topic = extractTopic(tweetContext.text);
-  
-  return pattern
-    .replace('{topic}', topic)
-    .replace('{constructivePoint}', generateConstructivePoint())
-    .replace('{insight}', generateInsight())
-    .replace('{addition}', generateAddition())
-    .replace('{positiveReinforcement}', generatePositiveReinforcement())
-    .replace('{enthusiasticResponse}', generateEnthusiasticResponse())
-    .replace('{supportiveComment}', generateSupportiveComment());
+function generateChaosReply(character, tweetContext) {
+  if (character.id !== 'chaotic') {
+    return generateRegularReply(character, tweetContext);
+  }
+
+  const numSegments = 2 + Math.floor(Math.random() * 3); // 2-4 segments
+  let reply = [];
+
+  for (let i = 0; i < numSegments; i++) {
+    let segment = generateChaosSegment(character, tweetContext);
+    
+    // Randomly apply emphasis
+    if (Math.random() > 0.5) {
+      const emphasisPattern = character.emphasisPatterns[Math.floor(Math.random() * character.emphasisPatterns.length)];
+      segment = emphasisPattern(segment);
+    }
+
+    reply.push(segment);
+  }
+
+  // Add random expressions
+  const numExpressions = 1 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < numExpressions; i++) {
+    const expression = character.expressions[Math.floor(Math.random() * character.expressions.length)];
+    reply.splice(Math.floor(Math.random() * reply.length), 0, expression);
+  }
+
+  return reply.join(' ');
+}
+
+function generateChaosSegment(character, tweetContext) {
+  const segments = [
+    () => `Did you know that ${getRandomVocab(character)} is connected to ${getRandomVocab(character)}?`,
+    () => `THEY don't want you to see the connection between ${getRandomVocab(character)} and ${extractTopic(tweetContext.text)}!`,
+    () => `I've been researching ${getRandomVocab(character)} for YEARS and finally someone gets it!`,
+    () => `The ${extractTopic(tweetContext.text)} is a clear sign of ${getRandomVocab(character)}`,
+    () => `Wake up to the truth about ${getRandomVocab(character)}`,
+    () => `${extractTopic(tweetContext.text)} is exactly what THEY use to hide ${getRandomVocab(character)}`,
+    () => `You're so close to discovering the truth about ${getRandomVocab(character)}`,
+    () => `This is EXACTLY what I saw in my ${getRandomVocab(character)} vision!`,
+    () => `The ${getRandomVocab(character)} energy is strong with this one`,
+    () => `I've been trying to warn everyone about ${getRandomVocab(character)}`
+  ];
+
+  return segments[Math.floor(Math.random() * segments.length)]();
+}
+
+function getRandomVocab(character) {
+  return character.vocabulary[Math.floor(Math.random() * character.vocabulary.length)];
 }
 
 function extractTopic(text) {
   const words = text.split(' ').filter(word => word.length > 4);
   return words[Math.floor(Math.random() * words.length)] || 'this';
-}
-
-function generateConstructivePoint() {
-  const points = [
-    'This could have significant implications for the industry.',
-    'Your approach offers a fresh perspective on the matter.',
-    'The data seems to support your conclusion.'
-  ];
-  return points[Math.floor(Math.random() * points.length)];
-}
-
-function generateInsight() {
-  const insights = [
-    'similar approaches have shown promising results',
-    'this aligns with current industry trends',
-    'the market seems ready for such innovations'
-  ];
-  return insights[Math.floor(Math.random() * insights.length)];
-}
-
-function generateAddition() {
-  const additions = [
-    'the long-term implications',
-    'potential scalability aspects',
-    'market readiness factors'
-  ];
-  return additions[Math.floor(Math.random() * additions.length)];
-}
-
-function generatePositiveReinforcement() {
-  const reinforcements = [
-    'Your insights are so valuable! ⭐',
-    'This is exactly what we needed to hear! ✨',
-    'You always bring such great energy! 🎯'
-  ];
-  return reinforcements[Math.floor(Math.random() * reinforcements.length)];
-}
-
-function generateEnthusiasticResponse() {
-  const responses = [
-    'Keep sharing these amazing ideas! 🚀',
-    'You are really onto something here! ⭐',
-    'This is pure genius! 💫'
-  ];
-  return responses[Math.floor(Math.random() * responses.length)];
-}
-
-function generateSupportiveComment() {
-  const comments = [
-    'Your dedication to this is inspiring! ⭐',
-    'You are making such a positive impact! ✨',
-    'Keep leading the way! 🎯'
-  ];
-  return comments[Math.floor(Math.random() * comments.length)];
 }
