@@ -23,6 +23,8 @@ function checkLoginAndTweetStatus() {
       if (response && response.tweetContext) {
         currentTweetContext = response.tweetContext;
         showMainContent();
+        // Auto-generate first reply after loading characters
+        loadCharactersAndGenerate();
       } else {
         showLoginPrompt();
       }
@@ -40,6 +42,21 @@ function showLoginPrompt() {
   document.getElementById('loginStatus').textContent = 'Open a tweet and click reply to use this extension';
   document.getElementById('loginStatus').classList.remove('hidden');
   document.getElementById('mainContent').classList.add('hidden');
+}
+
+// Load characters and auto-generate first reply
+function loadCharactersAndGenerate() {
+  chrome.storage.sync.get('characters', function(data) {
+    const characters = data.characters || [];
+    populateCharacterSelect(characters);
+    
+    // Auto-select chaotic character
+    const select = document.getElementById('characters');
+    select.value = 'chaotic';
+    
+    // Generate initial reply
+    generateReplyForCurrentCharacter();
+  });
 }
 
 // Load characters from storage
@@ -70,7 +87,9 @@ function handleCharacterChange() {
 
 // Handle regenerate button click
 function handleRegenerateClick() {
-  generateReplyForCurrentCharacter();
+  if (currentTweetContext) {
+    generateReplyForCurrentCharacter();
+  }
 }
 
 // Generate reply using current character
@@ -81,7 +100,9 @@ function generateReplyForCurrentCharacter() {
     return;
   }
 
-  generateReply(characterId, currentTweetContext);
+  if (currentTweetContext) {
+    generateReply(characterId, currentTweetContext);
+  }
 }
 
 // Clear reply area
