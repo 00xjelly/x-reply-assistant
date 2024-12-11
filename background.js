@@ -100,7 +100,7 @@ function generateAddition() {
 
 function generatePositiveReinforcement() {
   const reinforcements = [
-    'Your insights are so valuable! 🌟',
+    'Your insights are so valuable! ⭐',
     'This is exactly what we needed to hear! ✨',
     'You always bring such great energy! 🎯'
   ];
@@ -118,7 +118,7 @@ function generateEnthusiasticResponse() {
 
 function generateSupportiveComment() {
   const comments = [
-    'Your dedication to this is inspiring! 🌟',
+    'Your dedication to this is inspiring! ⭐',
     'You're making such a positive impact! ✨',
     'Keep leading the way! 🎯'
   ];
