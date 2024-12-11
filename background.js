@@ -25,10 +25,11 @@ function initializeDefaultCharacters() {
         'lizard people', 'mind control', 'THE TRUTH', 'secret society', 'ancient aliens',
         'dimensional portals', 'chemtrails', 'quantum consciousness', 'parallel universes',
         'time is not real', 'reality matrix', 'brain frequencies', 'cosmic alignment',
-        'energy vampires', 'thought control', 'synthetic reality'
+        'energy vampires', 'thought control', 'synthetic reality', 'matrix glitch',
+        'psychic waves', 'astral projection', 'neural implants', 'forbidden knowledge'
       ],
       expressions: [
-        '!!!', '!?!?!', '...', '👁️', '🔺', '⚠️', '🌌', '🧠', '🔮', 
+        '!!!', '!?!?!', '...', '👁️', '🔺', '⚠️', '🌌', '🧠', '🔮',
         '🛸', '🌀', '💫', '🌟', '⚡', '🔥', '💥', '🤯', '👽'
       ],
       emphasisPatterns: [
@@ -46,7 +47,9 @@ function initializeDefaultCharacters() {
 
 function handleReplyGeneration(request) {
   const { character, tweetContext } = request;
-  return generateChaosReply(character, tweetContext);
+  // Ensure we have some text to work with
+  const text = tweetContext?.text || 'this reality';
+  return generateChaosReply(character, { text });
 }
 
 function generateChaosReply(character, tweetContext) {
@@ -57,40 +60,51 @@ function generateChaosReply(character, tweetContext) {
   const numSegments = 2 + Math.floor(Math.random() * 3); // 2-4 segments
   let reply = [];
 
-  for (let i = 0; i < numSegments; i++) {
-    let segment = generateChaosSegment(character, tweetContext);
-    
-    // Randomly apply emphasis
-    if (Math.random() > 0.5) {
-      const emphasisPattern = character.emphasisPatterns[Math.floor(Math.random() * character.emphasisPatterns.length)];
-      segment = emphasisPattern(segment);
-    }
+  // Ensure at least one segment references the tweet content
+  reply.push(generateChaosSegment(character, tweetContext, true));
 
-    reply.push(segment);
+  // Add additional random segments
+  for (let i = 1; i < numSegments; i++) {
+    reply.push(generateChaosSegment(character, tweetContext, false));
   }
+
+  // Shuffle the segments
+  reply.sort(() => Math.random() - 0.5);
 
   // Add random expressions
   const numExpressions = 1 + Math.floor(Math.random() * 3);
   for (let i = 0; i < numExpressions; i++) {
     const expression = character.expressions[Math.floor(Math.random() * character.expressions.length)];
-    reply.splice(Math.floor(Math.random() * reply.length), 0, expression);
+    const insertPosition = Math.floor(Math.random() * (reply.length + 1));
+    reply.splice(insertPosition, 0, expression);
   }
+
+  // Randomly apply emphasis to some segments
+  reply = reply.map(segment => {
+    if (Math.random() > 0.7) { // 30% chance of emphasis
+      const emphasisPattern = character.emphasisPatterns[Math.floor(Math.random() * character.emphasisPatterns.length)];
+      return emphasisPattern(segment);
+    }
+    return segment;
+  });
 
   return reply.join(' ');
 }
 
-function generateChaosSegment(character, tweetContext) {
-  const segments = [
-    () => `Did you know that ${getRandomVocab(character)} is connected to ${getRandomVocab(character)}?`,
-    () => `THEY don't want you to see the connection between ${getRandomVocab(character)} and ${extractTopic(tweetContext.text)}!`,
-    () => `I've been researching ${getRandomVocab(character)} for YEARS and finally someone gets it!`,
+function generateChaosSegment(character, tweetContext, mustReferenceTweet) {
+  const segments = mustReferenceTweet ? [
     () => `The ${extractTopic(tweetContext.text)} is a clear sign of ${getRandomVocab(character)}`,
-    () => `Wake up to the truth about ${getRandomVocab(character)}`,
     () => `${extractTopic(tweetContext.text)} is exactly what THEY use to hide ${getRandomVocab(character)}`,
-    () => `You're so close to discovering the truth about ${getRandomVocab(character)}`,
+    () => `THEY don't want you to see the connection between ${getRandomVocab(character)} and ${extractTopic(tweetContext.text)}!`,
+    () => `Your ${extractTopic(tweetContext.text)} energy aligns with the ${getRandomVocab(character)} frequency`
+  ] : [
+    () => `Did you know that ${getRandomVocab(character)} is connected to ${getRandomVocab(character)}?`,
+    () => `I've been researching ${getRandomVocab(character)} for YEARS and finally someone gets it!`,
+    () => `Wake up to the truth about ${getRandomVocab(character)}`,
     () => `This is EXACTLY what I saw in my ${getRandomVocab(character)} vision!`,
     () => `The ${getRandomVocab(character)} energy is strong with this one`,
-    () => `I've been trying to warn everyone about ${getRandomVocab(character)}`
+    () => `I've been trying to warn everyone about ${getRandomVocab(character)}`,
+    () => `They're using ${getRandomVocab(character)} to control the ${getRandomVocab(character)}!!!`
   ];
 
   return segments[Math.floor(Math.random() * segments.length)]();
@@ -101,6 +115,10 @@ function getRandomVocab(character) {
 }
 
 function extractTopic(text) {
-  const words = text.split(' ').filter(word => word.length > 4);
-  return words[Math.floor(Math.random() * words.length)] || 'this';
+  const words = text.split(' ')
+    .filter(word => word.length > 3)
+    .filter(word => !word.startsWith('@'))
+    .filter(word => !word.startsWith('http'));
+  
+  return words[Math.floor(Math.random() * words.length)] || 'reality matrix';
 }
