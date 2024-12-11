@@ -1,1 +1,26 @@
-ewoJIm1hbmlmZXN0X3ZlcnNpb24iOiAzLAoJIm5hbWUiOiAiWCBSZXBseSBBc3Npc3RhbnQiLAoJInZlcnNpb24iOiAiMS4wIiwKCSJkZXNjcmlwdGlvbiI6ICJHZW5lcmF0ZSBjaGFyYWN0ZXItYmFzZWQgcmVwbGllcyBmb3IgWCBwb3N0cyIKfQ==
+{
+  "manifest_version": 3,
+  "name": "X Reply Assistant",
+  "version": "1.0",
+  "description": "Generate character-based replies for X posts",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://twitter.com/*", "https://x.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [{
+    "matches": ["https://twitter.com/*", "https://x.com/*"],
+    "js": ["content.js"]
+  }],
+  "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

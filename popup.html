@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>X Reply Assistant</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div id="loginStatus" class="hidden">
+      <p>Please log in to X to use this extension</p>
+    </div>
+    
+    <div id="mainContent" class="hidden">
+      <div id="characterSelect">
+        <label for="characters">Select Character:</label>
+        <select id="characters">
+          <option value="default">Select a character...</option>
+        </select>
+      </div>
+      
+      <div id="replySection">
+        <h3>Suggested Reply:</h3>
+        <div id="suggestedReply" class="reply-box"></div>
+        <button id="copyReply" class="btn">Copy to Clipboard</button>
+        <button id="insertReply" class="btn">Insert Reply</button>
+      </div>
+      
+      <button id="manageCharacters" class="btn secondary">Manage Characters</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
